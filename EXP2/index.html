@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login (Presentation Tier)</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; }
+        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; padding: 14px 20px; margin: 8px 0; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        #message { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Student Login</h2>
+        <form id="loginForm">
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="username" id="username" required>
+
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" id="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <p id="message"></p>
+        <p><small>Try: student1 / pass123</small></p>
+    </div>
+
+    <script>
+        // 4.b) Add JavaScript to send login requests to backend
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = 'Authenticating...';
+            messageElement.style.color = 'black';
+
+            // Communication from Presentation Tier (Client) to Application Tier (Server)
+            fetch('http://127.0.0.1:3000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle response from Application Tier
+                messageElement.textContent = data.message;
+                if (data.success) {
+                    messageElement.style.color = 'green';
+                } else {
+                    messageElement.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Network Error:', error);
+                messageElement.textContent = 'Error: Could not reach the Application Server.';
+                messageElement.style.color = 'red';
+            });
+        });
+    </script>
+</body>
+</html>

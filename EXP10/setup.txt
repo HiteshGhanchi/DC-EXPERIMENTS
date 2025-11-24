@@ -1,0 +1,26 @@
+docker compose up --build
+
+### Step 2: Run Static Test (Part 1 - Round Robin)
+
+In a new terminal, run the load test:
+
+```bash
+python3 load_test.py
+
+**Observation (Round Robin):** The output will show an almost **perfectly even distribution** (e.g., $334/333/333$), confirming the **static** nature of the Round Robin algorithm. 
+
+### Step 3: Simulate Dynamic Change (Part 2 - Adaptation)
+
+1.  **Simulate Failure:** Stop one application container (e.g., `app2`) to simulate failure or high load.
+    ```bash
+    docker stop app2
+    2.  **Re-run the Test:** Run the load test again:
+    ```bash
+    python3 load_test.py
+    
+**Observation (Dynamic Adaptation):** You will observe two key changes:
+
+* **Initial Failures:** You might see some initial errors for `app2` requests while Nginx figures out it's down.
+* **Redistribution:** Nginx will automatically remove `app2` from the rotation, and the load will be split between `app1` and `app3` (e.g., $500/500$), demonstrating a basic form of **dynamic fault tolerance**.
+
+This completes the required implementation and testing for LAB 10.
